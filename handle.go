@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -38,13 +37,13 @@ func GoReverseProxy(this *RProxy) *httputil.ReverseProxy {
 			// explicitly disable User-Agent so it's not set to default value
 			request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36")
 		}
-		log.Println("request.URL.Path：", request.URL.Path, "request.URL.RawQuery：", request.URL.RawQuery)
+		request.Header.Set("Accept-Encoding", "identity")
+		//log.Println("request.URL.Path：", request.URL.Path, "request.URL.RawQuery：", request.URL.RawQuery)
 	}
 
 	// 修改响应头
 	proxy.ModifyResponse = func(response *http.Response) error {
-		response.Header.Add("Access-Control-Allow-Origin", "*")
-		response.Header.Add("Author", "copy")
+		//response.Header.Add("Access-Control-Allow-Origin", "*")
 		contentType := response.Header.Get("Content-Type")
 		if contentType == "application/json" {
 			bs, err := ioutil.ReadAll(response.Body)
@@ -55,7 +54,7 @@ func GoReverseProxy(this *RProxy) *httputil.ReverseProxy {
 			if err != nil {
 				return err
 			}
-			bs = bytes.ReplaceAll(bs, []byte(this.oldHost), []byte(this.newHost))
+			bs = bytes.Replace(bs, []byte(this.oldHost), []byte(this.newHost),-1)
 			body := ioutil.NopCloser(bytes.NewReader(bs))
 			response.Body = body
 			response.ContentLength = int64(len(bs))

@@ -7,12 +7,12 @@ import (
 
 func main() {
 	listen := flag.String("p", ":8080", "listen port")
-	oldHost := flag.String("r", "matrix-client.matrix.org", "original host")
-	newHost := flag.String("l", "127.0.0.1", "new host")
+	originalHost := flag.String("r", "matrix-client.matrix.org", "original host")
+	proxyHost := flag.String("l", "127.0.0.1", "proxy host")
 	flag.Parse()
 	proxy := GoReverseProxy(&RProxy{
-		oldHost: *oldHost,
-		newHost: *newHost,
+		oldHost: *originalHost,
+		newHost: *proxyHost,
 	})
 	serveErr := http.ListenAndServe(*listen, proxy)
 	if serveErr != nil {
